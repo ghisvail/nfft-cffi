@@ -10,6 +10,10 @@ from cffi import FFI
 import pkgconfig
 
 
+if not pkgconfig.exists("nfft3"):
+    raise RuntimeError("NFFT library not found via pkgconfig.")
+pc_nfft3 = {key: list(val) for (key, val) in pkgconfig.parse("nfft3").items()}
+
 ffi = FFI()
 
 ffi.cdef("""
@@ -56,5 +60,5 @@ ffi.set_source(
     """    
     #include <nfft3.h>
     """,
-    **pkgconfig.parse("nfft3")
+    **pc_nfft3
 )
