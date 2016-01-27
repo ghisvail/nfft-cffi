@@ -13,7 +13,7 @@ import numpy
 __all__ = ("Plan")
 
 
-class Plan:
+class Plan(object):
   
     """The NFFT plan class."""
     
