@@ -47,9 +47,9 @@ class Plan(object):
         handle.x = ffi.cast("double *", x.ctypes.data)
         # Hold plan handle and interface arrays together.
         self.__handle = handle
-        self.f_hat = f_hat
-        self.f = f
-        self.x = x
+        self.__f_hat = f_hat
+        self.__f = f
+        self.__x = x
         # TODO: support precompute on instantiation.
 
     def __del__(self):
@@ -90,3 +90,15 @@ class Plan(object):
     def precompute(self):
         "Precompute the plan."
         lib.nfft_precompute_one_psi(self.__handle)
+
+    @property
+    def f_hat(self):
+        return self.__f_hat
+
+    @property
+    def f(self):
+        return self.__f
+
+    @property
+    def x(self):
+        return self.__x
