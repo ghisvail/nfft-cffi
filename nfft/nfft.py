@@ -28,31 +28,25 @@ class Plan(object):
                       lib.FFTW_INIT)
         fftw_flags = (lib.FFTW_ESTIMATE, lib.FFTW_DESTROY_INPUT)
         # Create plan handle.
-        plan = ffi.new("nfft_plan *")
-        lib.nfft_init_guru(
-            plan,
-            d,
-            ffi.new("const int []", N),
-            M,
-            ffi.new("const int []", n),
-            m,
+        handle = ffi.new("nfft_plan *")
+        lib.nfft_init_guru(handle, d, ffi.new("const int []", N), M,
+            ffi.new("const int []", n), m,
             reduce(lambda x, y: x | y, nfft_flags, 0),
-            reduce(lambda x, y: x | y, fftw_flags, 0),
-        )
+            reduce(lambda x, y: x | y, fftw_flags, 0))
         # Create and bind f_hat array.
         f_hat = numpy.empty(N, dtype=numpy.complex128)
-        plan.f_hat = ffi.cast("fftw_complex *", f_hat.ctypes.data)       
+        handle.f_hat = ffi.cast("fftw_complex *", f_hat.ctypes.data)
         # Create and bind f array.
         f = numpy.empty(M, dtype=numpy.complex128)
-        plan.f = ffi.cast("fftw_complex *", f.ctypes.data)
+        handle.f = ffi.cast("fftw_complex *", f.ctypes.data)
         # Create and bind x array.
         if d == 1:
             x = numpy.empty(M, dtype=numpy.float64)
         else:
             x = numpy.empty([M, d], dtype=numpy.float64)
-        plan.x = ffi.cast("double *", x.ctypes.data)
+        handle.x = ffi.cast("double *", x.ctypes.data)
         # Hold plan handle and interface arrays together.
-        self.__handle = plan
+        self.__handle = handle
         self.f_hat = f_hat
         self.f = f
         self.x = x
