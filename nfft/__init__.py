@@ -5,3 +5,10 @@
 # Distributed under the terms of the new BSD license.
 # See the accompanying LICENSE file or read the terms at
 # https://opensource.org/licenses/BSD-3-Clause.
+
+from pkg_resources import get_distribution, DistributionNotFound
+
+try:
+    __version__ = get_distribution("nfft-cffi").version
+except DistributionNotFound:
+    __version__ = "unknown"
