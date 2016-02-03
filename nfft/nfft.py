@@ -45,9 +45,19 @@ class Plan(object):
     def __del__(self):
         nfft_destroy_plan(self.__handle)
 
+    def forward(self):
+        """Compute and return the forward transform."""
+        self.execute_forward()
+        return self.__f
+
     def execute_forward(self):
         """Perform the foward transform."""
         nfft_execute_forward(self.__handle, self.__f_hat, self.__f)
+
+    def adjoint(self):
+        """Compute and return the adjoint transform."""
+        self.execute_adjoint()
+        return self.__f_hat
 
     def execute_adjoint(self):
         """Perform the adjoint transform."""
