@@ -6,90 +6,62 @@
 # See the accompanying LICENSE file or read the terms at
 # https://opensource.org/licenses/BSD-3-Clause.
 
-from ._nfft import ffi, lib
-from functools import reduce
+from __future__ import absolute_import
+
+from ._wrappers import (PRE_PHI_HUT, PRE_PSI, PRE_FULL_PSI, nfft_create_plan,
+                        nfft_destroy_plan, nfft_precompute_plan,
+                        nfft_execute_forward, nfft_execute_adjoint)
+from enum import IntEnum, unique
 import numpy
 
-__all__ = ("Plan")
+__all__ = ("Flags", "Plan")
+
+
+@unique
+class Flags(IntEnum):
+    PRE_PHI_HUT = PRE_PHI_HUT
+    PRE_PSI = PRE_PSI
+    PRE_FULL_PSI = PRE_FULL_PSI
 
 
 class Plan(object):
   
     """The NFFT plan class."""
     
-    def __init__(self, N, M, *args, **kwargs):
+    def __init__(self, N, M, n=None, m=6, flags=None, *args, **kwargs):
         "Instantiate the NFFT plan."        
         d = len(N)
-        n = [2 * Nt for Nt in N]
-        # TODO: auto-adjust with desired dtype.
-        m = 6
-        # TODO: auto-adjust with desired precomputation.
-        nfft_flags = (lib.PRE_PHI_HUT, lib.PRE_PSI, lib.FFT_OUT_OF_PLACE,
-                      lib.FFTW_INIT)
-        fftw_flags = (lib.FFTW_ESTIMATE, lib.FFTW_DESTROY_INPUT)
+        n = n if n is not None else tuple([2 * Nt for Nt in N])
+        flags = flags if flags is not None else (0,)
         # Create plan handle.
-        handle = ffi.new("nfft_plan *")
-        lib.nfft_init_guru(handle, d, ffi.new("const int []", N), M,
-            ffi.new("const int []", n), m,
-            reduce(lambda x, y: x | y, nfft_flags, 0),
-            reduce(lambda x, y: x | y, fftw_flags, 0))
-        # Create and bind f_hat array.
-        f_hat = numpy.empty(N, dtype=numpy.complex128)
-        handle.f_hat = ffi.cast("fftw_complex *", f_hat.ctypes.data)
-        # Create and bind f array.
-        f = numpy.empty(M, dtype=numpy.complex128)
-        handle.f = ffi.cast("fftw_complex *", f.ctypes.data)
-        # Create and bind x array.
+        self.__handle = nfft_create_plan(N, M, n, m, flags)
+        self.__f_hat = numpy.empty(N, dtype=numpy.complex128)
+        self.__f = numpy.empty(M, dtype=numpy.complex128)
         if d == 1:
-            x = numpy.empty(M, dtype=numpy.float64)
+            self.__x = numpy.empty(M, dtype=numpy.float64)
         else:
-            x = numpy.empty([M, d], dtype=numpy.float64)
-        handle.x = ffi.cast("double *", x.ctypes.data)
-        # Hold plan handle and interface arrays together.
-        self.__handle = handle
-        self.__f_hat = f_hat
-        self.__f = f
-        self.__x = x
-        # TODO: support precompute on instantiation.
+            self.__x = numpy.empty([M, d], dtype=numpy.float64)
 
     def __del__(self):
-        lib.nfft_finalize(self.__handle)
-
-    def forward(self, direct=False):
-        """Compute and return the forward transform."""
-        if direct:
-            self.execute_forward_direct()
-        else:
-            self.execute_forward()
-        return self.f
+        nfft_destroy_plan(self.__handle)
 
     def execute_forward(self):
-        """Perform the foward transform (fast)."""
-        lib.nfft_trafo(self.__handle)
-
-    def execute_forward_direct(self):
-        """Perform the forward transform (direct)."""
-        lib.nfft_trafo_direct(self.__handle)
-
-    def adjoint(self, direct=False):
-        """Compute and return the adjoint transform."""
-        if direct:
-            self.execute_adjoint_direct()
-        else:
-            self.execute_adjoint()
-        return self.f_hat
+        """Perform the foward transform."""
+        self.check()
+        nfft_execute_forward(self.__handle, self.__f_hat, self.__f)
 
     def execute_adjoint(self):
-        """Perform the adjoint transform (fast)."""
-        lib.nfft_adjoint(self.__handle)
-
-    def execute_adjoint_direct(self):
-        """Compute the adjoint transform (direct)."""
-        lib.nfft_adjoint_direct(self.__handle)
+        """Perform the adjoint transform."""
+        self.check()
+        nfft_execute_adjoint(self.__handle, self.__f, self.__f_hat)
 
     def precompute(self):
         "Precompute the plan."
-        lib.nfft_precompute_one_psi(self.__handle)
+        nfft_precompute_plan(self.__handle, self.__x)
+
+    def check(self):
+        """Check plan for errors."""
+        pass
 
     @property
     def f_hat(self):
