@@ -23,24 +23,24 @@ ffi.cdef("""
     typedef ... fftw_complex;
     
     #define FFTW_ESTIMATE ...
-    #define FFTW_DESTROY_INPUT ...    
+    #define FFTW_DESTROY_INPUT ...
     
     typedef struct {
         fftw_complex *f_hat;
         fftw_complex *f;
         double *x;
-        ...; 
+        ...;
     } nfft_plan;
-
+    
     void nfft_trafo_direct(nfft_plan *);
-    void nfft_adjoint_direct(nfft_plan *);     
+    void nfft_adjoint_direct(nfft_plan *);
     void nfft_trafo(nfft_plan *);
-    void nfft_adjoint(nfft_plan *);    
+    void nfft_adjoint(nfft_plan *);
     void nfft_init_guru(nfft_plan *, int, int *, int, int *, int, unsigned int,
-                        unsigned int);    
-    void nfft_precompute_one_psi(nfft_plan *); 
+                        unsigned int);
+    void nfft_precompute_one_psi(nfft_plan *);
     void nfft_finalize(nfft_plan *);
-        
+    
     #define PRE_PHI_HUT ...
     #define FG_PSI ...
     #define PRE_LIN_PSI ...
@@ -60,7 +60,7 @@ ffi.cdef("""
 
 ffi.set_source(
     "_bindings",
-    """    
+    """
     #include <nfft3.h>
     """,
     **pc_nfft3
