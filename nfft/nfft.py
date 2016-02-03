@@ -14,11 +14,11 @@ from ._wrappers import (PRE_PHI_HUT, PRE_PSI, PRE_FULL_PSI, nfft_create_plan,
 from enum import IntEnum, unique
 import numpy
 
-__all__ = ("Flags", "Plan")
+__all__ = ("Flag", "Plan")
 
 
 @unique
-class Flags(IntEnum):
+class Flag(IntEnum):
     PRE_PHI_HUT = PRE_PHI_HUT
     PRE_PSI = PRE_PSI
     PRE_FULL_PSI = PRE_FULL_PSI
@@ -47,21 +47,15 @@ class Plan(object):
 
     def execute_forward(self):
         """Perform the foward transform."""
-        self.check()
         nfft_execute_forward(self.__handle, self.__f_hat, self.__f)
 
     def execute_adjoint(self):
         """Perform the adjoint transform."""
-        self.check()
         nfft_execute_adjoint(self.__handle, self.__f, self.__f_hat)
 
     def precompute(self):
         "Precompute the plan."
         nfft_precompute_plan(self.__handle, self.__x)
-
-    def check(self):
-        """Check plan for errors."""
-        pass
 
     @property
     def f_hat(self):
