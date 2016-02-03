@@ -12,7 +12,10 @@ import pkgconfig
 
 if not pkgconfig.exists("nfft3"):
     raise RuntimeError("NFFT library not found via pkgconfig.")
+# Transform pkgconfig output to a dictionary of lists, which is the only format
+# accepted by distutils.
 pc_nfft3 = {key: list(val) for (key, val) in pkgconfig.parse("nfft3").items()}
+
 
 ffi = FFI()
 
@@ -56,9 +59,13 @@ ffi.cdef("""
 )
 
 ffi.set_source(
-    "_nfft",
+    "_bindings",
     """    
     #include <nfft3.h>
     """,
     **pc_nfft3
 )
+
+
+if __name__ == "__main__":
+    ffi.compile()

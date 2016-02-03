@@ -11,9 +11,9 @@ from setuptools import find_packages, setup
 setup(
     name="nfft-cffi",
     version="0.1.dev1",
-    packages=find_packages(exclude=["cffi_builders", "tests"]),
+    packages=find_packages(exclude=["builders", "docs", "tests"]),
     setup_requires=["cffi>=1.0.0", "pkgconfig"],
     install_requires=["cffi>=1.0.0", "numpy"],
     ext_package="nfft",
-    cffi_modules=["cffi_builders/nfft_build.py:ffi"],
+    cffi_modules=["builders/build_bindings.py:ffi"],
 )
