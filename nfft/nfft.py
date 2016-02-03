@@ -10,7 +10,9 @@ from __future__ import absolute_import
 
 from ._wrappers import (PRE_PHI_HUT, PRE_PSI, PRE_FULL_PSI, nfft_create_plan,
                         nfft_destroy_plan, nfft_precompute_plan,
-                        nfft_execute_forward, nfft_execute_adjoint)
+                        nfft_execute_forward, nfft_execute_adjoint,
+                        nfft_execute_forward_direct,
+                        nfft_execute_adjoint_direct,)
 from enum import IntEnum, unique
 import numpy
 
@@ -45,23 +47,37 @@ class Plan(object):
     def __del__(self):
         nfft_destroy_plan(self.__handle)
 
-    def forward(self):
+    def forward(self, direct=False):
         """Compute and return the forward transform."""
-        self.execute_forward()
+        if direct:
+            self.execute_forward_direct()
+        else:
+            self.execute_forward()
         return self.__f
 
     def execute_forward(self):
         """Perform the foward transform."""
         nfft_execute_forward(self.__handle, self.__f_hat, self.__f)
 
-    def adjoint(self):
+    def execute_forward_direct(self):
+        """Perform the foward transform."""
+        nfft_execute_forward_direct(self.__handle, self.__f_hat, self.__f)
+
+    def adjoint(self, direct=False):
         """Compute and return the adjoint transform."""
-        self.execute_adjoint()
+        if direct:
+            self.execute_adjoint_direct()
+        else:
+            self.execute_adjoint()
         return self.__f_hat
 
     def execute_adjoint(self):
         """Perform the adjoint transform."""
         nfft_execute_adjoint(self.__handle, self.__f, self.__f_hat)
+
+    def execute_adjoint_direct(self):
+        """Perform the adjoint transform using direct computation."""
+        nfft_execute_adjoint_direct(self.__handle, self.__f, self.__f_hat)
 
     def precompute(self):
         "Precompute the plan."

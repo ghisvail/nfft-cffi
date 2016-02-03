@@ -50,7 +50,19 @@ def nfft_execute_forward(handle, input_array, output_array):
     lib.nfft_trafo(handle)
 
 
+def nfft_execute_forward_direct(handle, input_array, output_array):
+    handle.f_hat = ffi.cast("fftw_complex *", input_array.ctypes.data)
+    handle.f = ffi.cast("fftw_complex *", output_array.ctypes.data)
+    lib.nfft_trafo_direct(handle)
+
+
 def nfft_execute_adjoint(handle, input_array, output_array):
     handle.f = ffi.cast("fftw_complex *", input_array.ctypes.data)
     handle.f_hat = ffi.cast("fftw_complex *", output_array.ctypes.data)  
     lib.nfft_adjoint(handle)
+
+
+def nfft_execute_adjoint_direct(handle, input_array, output_array):
+    handle.f = ffi.cast("fftw_complex *", input_array.ctypes.data)
+    handle.f_hat = ffi.cast("fftw_complex *", output_array.ctypes.data)
+    lib.nfft_adjoint_direct(handle)
