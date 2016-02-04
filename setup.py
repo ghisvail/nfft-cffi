@@ -19,10 +19,24 @@ def get_install_requires():
 
 
 setup(
+    name = 'nfft-cffi',
+    version = '0.1',
+    description = 'Python interface to the NFFT library',
+    url = 'https://github.com/ghisvail/nfft-cffi',
+    author = 'Ghislain Antony Vaillant',
+    author_email = 'ghisvail@gmail.com',
+    license = 'BSD',
+    classifiers = [
+        'Development Status :: 3 - Alpha'
+        'Intended Audience :: Science/Research'
+        'License :: OSI Approved :: BSD License'
+        'Programming Language :: Python'
+        'Topic :: Software Development'
+    ],
+    keywords = 'gridding nfft nufft nusfft',
     packages=find_packages(exclude=['builders', 'docs', 'tests']),
-    setup_requires=['cffi>=1.0.0', 'pkgconfig'],
+    setup_requires=['cffi>=1.0.0', 'pkgconfig', 'nose>=1.0'],
     install_requires=get_install_requires(),
-    test_requires=['nose'],
     ext_package='nfft',
     cffi_modules=['builders/build_bindings.py:ffi'],
 )
