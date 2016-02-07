@@ -39,8 +39,8 @@ def nfft_destroy_plan(handle):
     lib.nfft_finalize(handle)
 
 
-def nfft_precompute_plan(handle, x):
-    handle.x = ffi.cast("double *", x.ctypes.data)
+def nfft_precompute_plan(handle, knots_array):
+    handle.x = ffi.cast("double *", knots_array.ctypes.data)
     lib.nfft_precompute_one_psi(handle)
 
 
