@@ -33,9 +33,9 @@ def constructRadialKnots2D(numSpokes, numSamplesPerSpoke):
 	# M: number of samples in total
 	M = numSamplesPerSpoke * numSpokes
 	knots = np.zeros((M, 2))
-	for i in xrange(numSpokes):
+	for i in range(numSpokes):
 		# ith spoke
-		for j in xrange(numSamplesPerSpoke):
+		for j in range(numSamplesPerSpoke):
 			# jth sample on the current spoke
 
 			# Alternating forward and backward spokes
