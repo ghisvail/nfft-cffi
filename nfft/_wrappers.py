@@ -24,7 +24,7 @@ def nfft_create_plan(N, M, n, m, flags):
     handle = ffi.new("nfft_plan *")
     flags += (lib.FFTW_INIT, lib.FFT_OUT_OF_PLACE, lib.NFFT_SORT_NODES,
               lib.NFFT_OMP_BLOCKWISE_ADJOINT)
-    fftw_flags = (lib.FFTW_ESTIMATE, lib.FFTW_DESTROY_INPUT)
+    fftw_flags = (lib.FFTW_MEASURE, lib.FFTW_DESTROY_INPUT)
     lib.nfft_init_guru(handle,
                        len(N),
                        ffi.new("const int []", N),
