@@ -10,7 +10,9 @@ Installation
 
 Requirements
 ------------
-The following dependencies are required to build and run the package:
+
+The following dependencies are required to build, run and test the package:
+
   - setuptools
   - pkgconfig
   - numpy
