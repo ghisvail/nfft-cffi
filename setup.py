@@ -34,12 +34,12 @@ setup(
     author_email = 'ghisvail@gmail.com',
     license = 'BSD',
     classifiers = [
-        'Development Status :: 3 - Alpha'
-        'Intended Audience :: Science/Research'
-        'License :: OSI Approved :: BSD License'
-        'Programming Language :: Python'
-        'Topic :: Software Development'
-    ],
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python',
+        'Topic :: Software Development',
+        ],
     keywords = 'gridding nfft nufft nusfft',
     packages=find_packages(exclude=['builders', 'docs', 'tests']),
     setup_requires=['cffi>=1.0.0', 'pkgconfig', 'nose>=1.0'],
