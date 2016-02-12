@@ -18,10 +18,17 @@ def get_install_requires():
         install_requires.append('enum34')
 
 
+# Utility function to read the README file for the long_description field.
+def read(fname):
+    import os
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+
 setup(
     name = 'nfft-cffi',
     version = '0.1',
     description = 'Python interface to the NFFT library',
+    long_description=read('README.rst'),
     url = 'https://github.com/ghisvail/nfft-cffi',
     author = 'Ghislain Antony Vaillant',
     author_email = 'ghisvail@gmail.com',
