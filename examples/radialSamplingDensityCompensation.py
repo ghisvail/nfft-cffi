@@ -8,9 +8,9 @@
 
 '''
 Description:
-	Given a 2D object as input, simulate a very basic MR acquisition with a radial trajectory.
-	Reconstruct the simulated k-space data once with and once without weights compensating for the sampling density.
-	Visualize the results and the point spread function.
+    Given a 2D object as input, simulate a very basic MR acquisition with a radial trajectory.
+    Reconstruct the simulated k-space data once with and once without weights compensating for the sampling density.
+    Visualize the results and the point spread function.
 '''
 
 from __future__ import division
@@ -20,33 +20,35 @@ from scipy.io import loadmat
 
 
 def constructRadialKnots2D(numSpokes, numSamplesPerSpoke):
-	'''
-	Generates the 2D locations of data samples within the range [-0.5, 0.5] ** 2 lying on a radial trajectory
-	:param numSpokes: number of spokes to generate
-	:param numSamplesPerSpoke: number of data points along one spoke
-	:return: ndarray of size (numSpokes * numSamplesPerSpoke, 2) indicating the location of each sample point in k-space
-	'''
+    '''
+    Generates the 2D locations of data samples within the range [-0.5, 0.5] ** 2 lying on a radial trajectory
+    :param numSpokes: number of spokes to generate
+    :param numSamplesPerSpoke: number of data points along one spoke
+    :return: ndarray of size (numSpokes * numSamplesPerSpoke, 2) indicating the location of each sample point in k-space
+    '''
 
-	# Make sure numSamplesPerSpoke is an odd number such that we have a center sample
-	assert numSamplesPerSpoke % 2 == 1
+    # Make sure numSamplesPerSpoke is an odd number such that we have a center sample
+    assert numSamplesPerSpoke % 2 == 1
 
-	# M: number of samples in total
-	M = numSamplesPerSpoke * numSpokes
-	knots = np.zeros((M, 2))
-	for i in range(numSpokes):
-		# ith spoke
-		for j in range(numSamplesPerSpoke):
-			# jth sample on the current spoke
+    # M: number of samples in total
+    M = numSamplesPerSpoke * numSpokes
+    knots = np.zeros((M, 2))
+    for i in range(numSpokes):
+        # ith spoke
+        for j in range(numSamplesPerSpoke):
+            # jth sample on the current spoke
+            
+            # Alternating forward and backward spokes
+            if i % 2 == 0:
+                r = -j / (numSamplesPerSpoke - 1) + 1 / 2.0
+            else:
+                r = j / (numSamplesPerSpoke - 1) - 1 / 2.0
 
-			# Alternating forward and backward spokes
-			if i % 2 == 0:
-				r = -j / (numSamplesPerSpoke - 1) + 1/2.0
-			else:
-				r = j / (numSamplesPerSpoke - 1) - 1/2.0
-
-			knots[i*numSamplesPerSpoke + j] = [r * np.sin((i * np.pi / numSpokes)), r * np.cos(i * np.pi / numSpokes)]
-
-	return knots
+            knots[i*numSamplesPerSpoke+j] = [
+                r * np.sin(i * np.pi / numSpokes),
+                r * np.cos(i * np.pi / numSpokes)]
+            
+    return knots
 
 
 # Load phantom with original size 256x256
@@ -96,7 +98,8 @@ plan.forward()
 kspace = np.copy(plan.f)
 
 # Compute point spread function
-np.copyto(plan.f, np.ones(numSpokes * numSamplesPerSpoke) * np.tile(wAnaly, numSpokes))
+np.copyto(plan.f, np.ones(numSpokes * numSamplesPerSpoke) * \
+    np.tile(wAnaly, numSpokes))
 psfAnaly = np.copy(plan.adjoint())
 
 # Compute adjoint without the sampling density compensation
@@ -120,7 +123,8 @@ fHatNoDcf = np.abs(fHatNoDcf)[lfov:rfov, lfov:rfov]
 fHatDcfAnaly = np.abs(fHatDcfAnaly)[lfov:rfov, lfov:rfov]
 
 # Radial mask
-dmask = np.sum((np.mgrid[0:Nx-2*zeropadding, 0:Nx-2*zeropadding] - (Nx-2*zeropadding) // 2) ** 2, axis=0) ** 0.5
+dmask = np.sum((np.mgrid[0:Nx-2*zeropadding, 0:Nx-2*zeropadding] - \
+    (Nx-2*zeropadding) // 2) ** 2, axis=0) ** 0.5
 rmask = dmask < (1.0 * Nx / 2)
 
 # Plot
@@ -138,5 +142,6 @@ axes[1, 1].imshow(fHatDcfAnaly * rmask, cmap=cm.gray, interpolation='none')
 axes[1, 1].set_title("Adjoint with density compensation")
 axes[1, 1].axis('off')
 
-fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, hspace=0.25, wspace=0.25)
+fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, hspace=0.25,
+                    wspace=0.25)
 plt.show()
