@@ -108,7 +108,6 @@ np.copyto(plan.f, kspace * np.tile(wAnaly, numSpokes))
 fHatDcfAnaly = np.copy(plan.adjoint())
 
 import matplotlib
-matplotlib.rc('text', usetex=True)
 matplotlib.rc('font', size=4)
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
