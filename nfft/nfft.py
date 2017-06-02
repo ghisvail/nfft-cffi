@@ -6,91 +6,82 @@
 # it under the terms of the BSD license. See the accompanying LICENSE file
 # or read the terms at https://opensource.org/licenses/BSD-3-Clause.
 
-from __future__ import absolute_import
+from __future__ import division
+from ._ffi import ffi, lib
+from contextlib import contextmanager
+from enum import IntEnum
+from numpy import ascontiguousarray, empty
 
-from ._wrappers import (PRE_PHI_HUT, PRE_PSI, PRE_FULL_PSI, nfft_create_plan,
-                        nfft_destroy_plan, nfft_precompute_plan,
-                        nfft_execute_forward, nfft_execute_adjoint,
-                        nfft_execute_forward_direct,
-                        nfft_execute_adjoint_direct,)
-from enum import IntEnum, unique
-import numpy
-
-__all__ = ("Flag", "Plan")
+__all__ = ('nfft', 'nffth')
 
 
-@unique
-class Flag(IntEnum):
-    PRE_PHI_HUT = PRE_PHI_HUT
-    PRE_PSI = PRE_PSI
-    PRE_FULL_PSI = PRE_FULL_PSI
+@contextmanager
+def make_plan(f_hat, f, x, m=12):
+    from functools import reduce
+    from operator import or_
+
+    class Flag(IntEnum):
+        PRE_PHI_HUT      = 2**0
+        FG_PSI           = 2**1
+        PRE_LIN_PSI      = 2**2
+        PRE_FG_PSI       = 2**3
+        PRE_PSI          = 2**4
+        PRE_FULL_PSI     = 2**5
+        FFT_OUT_OF_PLACE = 2**9
+        FFTW_INIT        = 2**10
+
+    def to_native_const_int(iterable):
+        return ffi.new("const int []", iterable)
+
+    def to_native_cdouble(buffer):
+        return ffi.cast("fftw_complex *", ffi.from_buffer(buffer))
+
+    def to_native_double(buffer):
+        return ffi.cast("double *", ffi.from_buffer(buffer))
+
+    flags = (Flag.PRE_PHI_HUT, Flag.PRE_PSI, Flag.FFT_OUT_OF_PLACE,
+             Flag.FFTW_INIT)
+
+    p = ffi.new("nfft_plan *")
+    lib.nfft_init_guru(p, f_hat.ndim, to_native_const_int(f_hat.shape), f.size,
+                       to_native_const_int([2 * d for d in f_hat.shape]), m,
+                       reduce(or_, flags, 0), 1)
+
+    p.f_hat = to_native_cdouble(memoryview(f_hat))
+    p.f = to_native_cdouble(memoryview(f))
+    p.x = to_native_double(memoryview(x))
+
+    yield p
+
+    lib.nfft_finalize(p)
 
 
-class Plan(object):
-  
-    """The NFFT plan class."""
-    
-    def __init__(self, N, M, n=None, m=6, flags=None, *args, **kwargs):
-        "Instantiate the NFFT plan."        
-        d = len(N)
-        n = n if n is not None else tuple([2 * Nt for Nt in N])
-        flags = flags if flags is not None else (0,)
-        # Create plan handle.
-        self.__handle = nfft_create_plan(N, M, n, m, flags)
-        self.__f_hat = numpy.empty(N, dtype=numpy.complex128)
-        self.__f = numpy.empty(M, dtype=numpy.complex128)
-        if d == 1:
-            self.__x = numpy.empty(M, dtype=numpy.float64)
-        else:
-            self.__x = numpy.empty([M, d], dtype=numpy.float64)
+def nfft(f_hat, x, *args, **kwargs):
+    """
+    Compute the forward non-uniform Fourier transform.
+    """
+    f_hat = ascontiguousarray(f_hat, dtype='cdouble')
+    x = ascontiguousarray(x, dtype='double')
+    f = empty(x.size//f_hat.ndim, dtype='cdouble')
 
-    def __del__(self):
-        nfft_destroy_plan(self.__handle)
+    with make_plan(f_hat, f, x, *args, **kwargs) as p:
+        lib.nfft_precompute_one_psi(p)
+        lib.nfft_trafo(p)
 
-    def forward(self, direct=False):
-        """Compute and return the forward transform."""
-        if direct:
-            self.execute_forward_direct()
-        else:
-            self.execute_forward()
-        return self.__f
+    return f
 
-    def execute_forward(self):
-        """Perform the foward transform."""
-        nfft_execute_forward(self.__handle, self.__f_hat, self.__f)
 
-    def execute_forward_direct(self):
-        """Perform the foward transform."""
-        nfft_execute_forward_direct(self.__handle, self.__f_hat, self.__f)
+def nffth(f, x, N, *args, **kwargs):
+    """
+    Compute the adjoint non-uniform Fourier transform.
+    """
+    f = ascontiguousarray(f, dtype='cdouble')
+    x = ascontiguousarray(x, dtype='double')
+    f_hat = empty(N, dtype='cdouble')
 
-    def adjoint(self, direct=False):
-        """Compute and return the adjoint transform."""
-        if direct:
-            self.execute_adjoint_direct()
-        else:
-            self.execute_adjoint()
-        return self.__f_hat
+    with make_plan(f_hat, f, x, *args, **kwargs) as p:
+        lib.nfft_precompute_one_psi(p)
+        lib.nfft_adjoint(p)
 
-    def execute_adjoint(self):
-        """Perform the adjoint transform."""
-        nfft_execute_adjoint(self.__handle, self.__f, self.__f_hat)
+    return f_hat
 
-    def execute_adjoint_direct(self):
-        """Perform the adjoint transform using direct computation."""
-        nfft_execute_adjoint_direct(self.__handle, self.__f, self.__f_hat)
-
-    def precompute(self):
-        "Precompute the plan."
-        nfft_precompute_plan(self.__handle, self.__x)
-
-    @property
-    def f_hat(self):
-        return self.__f_hat
-
-    @property
-    def f(self):
-        return self.__f
-
-    @property
-    def x(self):
-        return self.__x
