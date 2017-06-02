@@ -58,5 +58,6 @@ def test_all():
         f_hat = rand_unit_complex(N)
         f = rand_unit_complex(M)
         x = rand_unit_shifted([f.size, f_hat.ndim])
+        # FIXME: Use of yield to generate test cases is deprecated.
         yield check_forward, f_hat, f, x
         yield check_adjoint, f_hat, f, x
