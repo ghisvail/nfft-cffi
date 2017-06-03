@@ -39,7 +39,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
         ],
-    keywords='gridding nfft nufft nusfft',
+    keywords='dft nfft',
     packages=find_packages(exclude=['docs', 'tests']),
     setup_requires=['cffi>=1.0.0', 'pkgconfig'],
     install_requires=get_install_requires(),
