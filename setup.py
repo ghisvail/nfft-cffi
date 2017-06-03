@@ -25,7 +25,7 @@ def get_install_requires():
 
 setup(
     name='nfft-cffi',
-    version='0.1',
+    version='0.2',
     description='Python interface to the NFFT library',
     long_description=get_description(),
     url='https://github.com/ghisvail/nfft-cffi',
