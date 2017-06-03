@@ -41,7 +41,7 @@ setup(
         ],
     keywords='gridding nfft nufft nusfft',
     packages=find_packages(exclude=['docs', 'tests']),
-    setup_requires=['cffi>=1.0.0', 'pkgconfig', 'nose>=1.0'],
+    setup_requires=['cffi>=1.0.0', 'pkgconfig'],
     install_requires=install_requires,
     cffi_modules=['build.py:ffibuilder'],
 )
