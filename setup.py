@@ -43,6 +43,5 @@ setup(
     packages=find_packages(exclude=['builders', 'docs', 'tests']),
     setup_requires=['cffi>=1.0.0', 'pkgconfig', 'nose>=1.0'],
     install_requires=install_requires,
-    ext_package='nfft',
     cffi_modules=['build.py:ffibuilder'],
 )
