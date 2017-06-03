@@ -10,14 +10,13 @@
 from __future__ import division
 from ._nfft3 import ffi, lib
 from contextlib import contextmanager
-from enum import IntEnum
-from numpy import ascontiguousarray, empty
 
 __all__ = ('nfft', 'nffth')
 
 
 @contextmanager
 def make_plan(f_hat, f, x, m=12):
+    from enum import IntEnum
     from functools import reduce
     from operator import or_
 
@@ -73,6 +72,8 @@ def nfft(f_hat, x, *args, **kwargs):
     out : array of complex floats
         Output values.
     """
+    from numpy import ascontiguousarray, empty
+
     f_hat = ascontiguousarray(f_hat, dtype='cdouble')
     x = ascontiguousarray(x, dtype='double')
     f = empty(x.size//f_hat.ndim, dtype='cdouble')
@@ -102,6 +103,8 @@ def nffth(f, x, N, *args, **kwargs):
     out : array of complex floats
         Output values.
     """
+    from numpy import ascontiguousarray, empty
+
     f = ascontiguousarray(f, dtype='cdouble')
     x = ascontiguousarray(x, dtype='double')
     f_hat = empty(N, dtype='cdouble')
@@ -111,4 +114,3 @@ def nffth(f, x, N, *args, **kwargs):
         lib.nfft_adjoint(p)
 
     return f_hat
-
