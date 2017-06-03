@@ -1,3 +1,4 @@
+"""Non-uniform Fast Fourier transform."""
 # Copyright (c) 2016, Imperial College London
 # Copyright (c) 2016, Ghislain Antony Vaillant
 # All rights reserved.
@@ -59,6 +60,18 @@ def make_plan(f_hat, f, x, m=12):
 def nfft(f_hat, x, *args, **kwargs):
     """
     Compute the forward non-uniform Fourier transform.
+
+    Parameters
+    ----------
+    f_hat : array of complex floats
+        Regularly-sampled input values.
+    x : array of floats
+        Coordinates of the output values.
+
+    Returns
+    -------
+    out : array of complex floats
+        Output values.
     """
     f_hat = ascontiguousarray(f_hat, dtype='cdouble')
     x = ascontiguousarray(x, dtype='double')
@@ -74,6 +87,20 @@ def nfft(f_hat, x, *args, **kwargs):
 def nffth(f, x, N, *args, **kwargs):
     """
     Compute the adjoint non-uniform Fourier transform.
+
+    Parameters
+    ----------
+    f : array of complex floats
+        Irregularly-sampled input values.
+    x : array of floats
+        Coordinates of the input values.
+    N : int or sequence of ints
+        Dimensions of the regularly-sampled output.
+
+    Returns
+    -------
+    out : array of complex floats
+        Output values.
     """
     f = ascontiguousarray(f, dtype='cdouble')
     x = ascontiguousarray(x, dtype='double')
