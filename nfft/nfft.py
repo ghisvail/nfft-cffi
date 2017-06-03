@@ -8,7 +8,7 @@
 # or read the terms at https://opensource.org/licenses/BSD-3-Clause.
 
 from __future__ import division
-from ._ffi import ffi, lib
+from ._nfft3 import ffi, lib
 from contextlib import contextmanager
 from enum import IntEnum
 from numpy import ascontiguousarray, empty

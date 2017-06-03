@@ -36,7 +36,7 @@ source = """
 
 ffibuilder = FFI()
 ffibuilder.cdef(cdef)
-ffibuilder.set_source('_ffi', source, **config)
+ffibuilder.set_source('nfft._nfft3', source, **config)
 
 
 if __name__ == '__main__':
