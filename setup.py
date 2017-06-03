@@ -24,22 +24,22 @@ def read(fname):
 
 
 setup(
-    name = 'nfft-cffi',
-    version = '0.1',
-    description = 'Python interface to the NFFT library',
+    name='nfft-cffi',
+    version='0.1',
+    description='Python interface to the NFFT library',
     long_description=read('README.rst'),
-    url = 'https://github.com/ghisvail/nfft-cffi',
-    author = 'Ghislain Antony Vaillant',
-    author_email = 'ghisvail@gmail.com',
-    license = 'BSD',
-    classifiers = [
+    url='https://github.com/ghisvail/nfft-cffi',
+    author='Ghislain Antony Vaillant',
+    author_email='ghisvail@gmail.com',
+    license='BSD',
+    classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Topic :: Software Development',
         ],
-    keywords = 'gridding nfft nufft nusfft',
+    keywords='gridding nfft nufft nusfft',
     packages=find_packages(exclude=['builders', 'docs', 'tests']),
     setup_requires=['cffi>=1.0.0', 'pkgconfig', 'nose>=1.0'],
     install_requires=install_requires,
