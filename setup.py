@@ -7,27 +7,27 @@
 # or read the terms at https://opensource.org/licenses/BSD-3-Clause.
 
 from setuptools import find_packages, setup
-from distutils.version import StrictVersion
-from sys import version_info
 
 
-install_requires = ['cffi>=1.0.0', 'numpy']
-py_version = StrictVersion('.'.join(str(n) for n in version_info[:3]))
-if py_version < StrictVersion('3.4'):
-    install_requires.append('enum34')
-
-
-# Utility function to read the README file for the long_description field.
-def read(fname):
+def get_description():
     from os.path import join, dirname
-    return open(join(dirname(__file__), fname)).read()
+    return open(join(dirname(__file__), 'README.rst')).read()
+
+
+def get_install_requires():
+    from distutils.version import StrictVersion
+    from sys import version_info
+    install_requires = ['cffi>=1.0.0', 'numpy']
+    py_version = StrictVersion('.'.join(str(n) for n in version_info[:3]))
+    if py_version < StrictVersion('3.4'):
+        install_requires.append('enum34')
 
 
 setup(
     name='nfft-cffi',
     version='0.1',
     description='Python interface to the NFFT library',
-    long_description=read('README.rst'),
+    long_description=get_description(),
     url='https://github.com/ghisvail/nfft-cffi',
     author='Ghislain Antony Vaillant',
     author_email='ghisvail@gmail.com',
@@ -42,6 +42,6 @@ setup(
     keywords='gridding nfft nufft nusfft',
     packages=find_packages(exclude=['docs', 'tests']),
     setup_requires=['cffi>=1.0.0', 'pkgconfig'],
-    install_requires=install_requires,
+    install_requires=get_install_requires(),
     cffi_modules=['build.py:ffibuilder'],
 )
